@@ -1,11 +1,10 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'sequel/pg_advisory_lock/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'sequel-pg_advisory_lock'
-  spec.version       = Sequel::PgAdvisoryLock::VERSION
+  spec.version       = '0.1.0'
   spec.authors       = ['Yury Shchyhlinski']
   spec.email         = ['Shchyhlinski.YL@gmail.com']
 
@@ -19,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'bin'
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
+
+  spec.add_dependency 'sequel'
 
   spec.add_development_dependency 'bundler', '~> 1.15'
   spec.add_development_dependency 'rake', '~> 10.0'
