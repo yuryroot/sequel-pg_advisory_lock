@@ -24,7 +24,7 @@ describe Sequel::Postgres::PgAdvisoryLock do
 
       assert_nil subject.registered_advisory_locks[lock_name]
       subject.register_advisory_lock(lock_name)
-      assert_equal default_lock_function, subject.registered_advisory_locks[lock_name][:lock_function]
+      assert_equal default_lock_function, subject.registered_advisory_locks[lock_name].fetch(:lock_function)
     end
 
     it 'should register locks for all supported PostgreSQL functions' do
@@ -33,13 +33,13 @@ describe Sequel::Postgres::PgAdvisoryLock do
 
         assert_nil subject.registered_advisory_locks[lock_name]
         subject.register_advisory_lock(lock_name, lock_function)
-        assert_equal lock_function, subject.registered_advisory_locks[lock_name][:lock_function]
+        assert_equal lock_function, subject.registered_advisory_locks[lock_name].fetch(:lock_function)
       end
     end
 
-    it 'should prevent specifying invalid PostgreSQL function as lock type' do
-      lock_name = :invalid_lock_function_test
-      lock_function = :invalid_lock_functions
+    it 'should prevent specifying not supported PostgreSQL function as lock type' do
+      lock_name = :not_supported_lock_function_test
+      lock_function = :not_supported_lock_function
 
       exception = assert_raises do
         subject.register_advisory_lock(lock_name, lock_function)
@@ -83,48 +83,61 @@ describe Sequel::Postgres::PgAdvisoryLock do
   end
 
   describe '#with_advisory_lock' do
+    it 'check "pg_advisory_lock"' do
+      subject.register_advisory_lock(:lock, :pg_advisory_lock)
 
-    it 'Sequel.synchronize must be used inside block' do
-      assert false
-    end
+      concurrency = 100
+      threads = []
+      state_mutex = Mutex.new
 
-    it 'should call PostgreSQL function of type that specified in register method' do
-      assert false
-    end
+      started_threads = []
+      fetched_threads = []
+      released_threads = []
+      active_locks = Set.new
 
-    it 'should call PostgreSQL function with one argument if "id" is not specified' do
-      assert false
-    end
+      Thread.abort_on_exception = true
 
-    it 'should call PostgreSQL function with two arguments if "id" is specified' do
-      assert false
-    end
+      concurrency.times do |index|
+        threads << Thread.new(index) do |thread_number|
+          state_mutex.synchronize { started_threads << thread_number }
 
-    it 'should release lock after block call' do
-      assert false
-    end
+          subject.with_advisory_lock(:lock) do
+            state_mutex.synchronize do
+              fetched_threads << thread_number
+              active_locks << thread_number
+            end
 
-    it '"try" locks should not wait locks releasing' do
-      assert false
-    end
+            sleep rand(0.001..0.01)
+          end
 
-    describe 'locks' do
+          state_mutex.synchronize do
+            released_threads << thread_number
+            active_locks.delete(thread_number)
 
-      it 'check "pg_advisory_lock"' do
-        assert false
+            assert_operator active_locks.count, :<=, 1
+            assert_operator started_threads.count, :>=, fetched_threads.count
+            assert_operator released_threads.count, :<=, fetched_threads.count
+          end
+        end
       end
 
-      it 'check "pg_try_advisory_lock"' do
-        assert false
-      end
+      threads.map(&:join)
 
-      it 'check "pg_advisory_xact_lock"' do
-        assert false
-      end
+      assert_equal concurrency, started_threads.count
+      assert_equal concurrency, fetched_threads.count
+      assert_equal concurrency, released_threads.count
+    end
 
-      it 'check "pg_try_advisory_xact_lock"' do
-        assert false
-      end
+    it 'check "pg_try_advisory_lock"' do
+      assert false
+    end
+
+    it 'check "pg_advisory_xact_lock"' do
+      assert false
+    end
+
+    it 'check "pg_try_advisory_xact_lock"' do
+      assert false
     end
   end
 end
