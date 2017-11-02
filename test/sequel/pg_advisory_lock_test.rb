@@ -83,49 +83,44 @@ describe Sequel::Postgres::PgAdvisoryLock do
   end
 
   describe '#with_advisory_lock' do
+
+    def overlap?(array1, array2)
+      (array1[0] - array2[1]) * (array2[0] - array1[1]) > 0
+    end
+
     it 'check "pg_advisory_lock"' do
       subject.register_advisory_lock(:lock, :pg_advisory_lock)
 
       concurrency = 100
       threads = []
-      state_mutex = Mutex.new
 
-      started_threads = []
-      fetched_threads = []
-      released_threads = []
-      active_locks = Set.new
+      fetched_locks = []
+      fetched_locks_mutex = Mutex.new
 
-      Thread.abort_on_exception = true
-
-      concurrency.times do |index|
-        threads << Thread.new(index) do |thread_number|
-          state_mutex.synchronize { started_threads << thread_number }
+      concurrency.times do
+        threads << Thread.new do
+          from, to = nil
 
           subject.with_advisory_lock(:lock) do
-            state_mutex.synchronize do
-              fetched_threads << thread_number
-              active_locks << thread_number
-            end
-
+            from = Time.now.to_f
             sleep rand(0.001..0.01)
+            to = Time.now.to_f
           end
 
-          state_mutex.synchronize do
-            released_threads << thread_number
-            active_locks.delete(thread_number)
-
-            assert_operator active_locks.count, :<=, 1
-            assert_operator started_threads.count, :>=, fetched_threads.count
-            assert_operator released_threads.count, :<=, fetched_threads.count
+          fetched_locks_mutex.synchronize do
+            fetched_locks << [from, to] if from && to
           end
         end
       end
 
       threads.map(&:join)
 
-      assert_equal concurrency, started_threads.count
-      assert_equal concurrency, fetched_threads.count
-      assert_equal concurrency, released_threads.count
+      no_overlap_locks = fetched_locks.combination(2).none? do |lock1_info, lock2_info|
+        overlap?(lock1_info, lock2_info)
+      end
+
+      assert no_overlap_locks
+      assert_equal concurrency, fetched_locks.size
     end
 
     it 'check "pg_try_advisory_lock"' do
