@@ -83,6 +83,9 @@ describe Sequel::Postgres::PgAdvisoryLock do
   end
 
   describe '#with_advisory_lock' do
+    before do
+      subject.registered_advisory_locks.clear
+    end
 
     def overlap?(array1, array2)
       (array1[0] - array2[1]) * (array2[0] - array1[1]) > 0
@@ -124,7 +127,32 @@ describe Sequel::Postgres::PgAdvisoryLock do
     end
 
     it 'check "pg_try_advisory_lock"' do
-      assert false
+      subject.register_advisory_lock(:lock, :pg_try_advisory_lock)
+
+      concurrency = 100
+      threads = []
+
+      fetched_locks_counter = 0
+      fetched_locks_mutex = Mutex.new
+
+      concurrency.times do
+        threads << Thread.new do
+          lock_fetched = false
+
+          subject.with_advisory_lock(:lock) do
+            lock_fetched = true
+            sleep(2)
+          end
+
+          fetched_locks_mutex.synchronize do
+            fetched_locks_counter += 1 if lock_fetched
+          end
+        end
+      end
+
+      threads.map(&:join)
+
+      assert_equal 1, fetched_locks_counter
     end
 
     it 'check "pg_advisory_xact_lock"' do
