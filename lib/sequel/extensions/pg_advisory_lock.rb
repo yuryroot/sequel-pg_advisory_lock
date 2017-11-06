@@ -5,12 +5,17 @@ module Sequel
   module Postgres
     module PgAdvisoryLock
 
-      LOCK_FUNCTIONS = %i[
+      SESSION_LEVEL_LOCKS = %i[
         pg_advisory_lock
         pg_try_advisory_lock
+      ].freeze
+
+      TRANSACTION_LEVEL_LOCKS = %i[
         pg_advisory_xact_lock
         pg_try_advisory_xact_lock
       ].freeze
+
+      LOCK_FUNCTIONS = (SESSION_LEVEL_LOCKS + TRANSACTION_LEVEL_LOCKS).freeze
 
       DEFAULT_LOCK_FUNCTION = :pg_advisory_lock
       UNLOCK_FUNCTION = :pg_advisory_unlock
@@ -23,16 +28,28 @@ module Sequel
         options = registered_advisory_locks.fetch(name.to_sym)
 
         lock_key = options.fetch(:key)
-
-        lock_function = options.fetch(:lock_function)
         function_params = [lock_key, id].compact
 
-        synchronize do
+        lock_function = options.fetch(:lock_function)
+        transaction_level_lock = TRANSACTION_LEVEL_LOCKS.include?(lock_function)
+
+        if transaction_level_lock
+          unless in_transaction?
+            raise "Transaction must be manually opened before using transaction level lock '#{lock_function}'"
+          end
+
           if get(Sequel.function(lock_function, *function_params))
-            begin
-              yield
-            ensure
-              get(Sequel.function(UNLOCK_FUNCTION, *function_params))
+            yield
+          end
+        else
+          synchronize do
+            if get(Sequel.function(lock_function, *function_params))
+              begin
+                result = yield
+              ensure
+                get(Sequel.function(UNLOCK_FUNCTION, *function_params))
+                result
+              end
             end
           end
         end
