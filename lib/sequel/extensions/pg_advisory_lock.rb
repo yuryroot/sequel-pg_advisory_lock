@@ -34,6 +34,9 @@ module Sequel
         transaction_level_lock = TRANSACTION_LEVEL_LOCKS.include?(lock_function)
 
         if transaction_level_lock
+          # TODO: It's allowed to specify additional options (in particular, :server)
+          #       while opening database transaction.
+          #       That's why this check must be smarter.
           unless in_transaction?
             raise "Transaction must be manually opened before using transaction level lock '#{lock_function}'"
           end
