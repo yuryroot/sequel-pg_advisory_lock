@@ -21,7 +21,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'sequel'
 
-  spec.add_development_dependency 'pg'
+  if RUBY_PLATFORM =~ /java/
+    spec.add_development_dependency 'jdbc-postgres'
+  elsif RUBY_VERSION < '2.0.0'
+    spec.add_development_dependency 'pg', '<0.19.0'
+  else
+    spec.add_development_dependency 'pg'
+  end
+
   spec.add_development_dependency 'bundler', '~> 1.15'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'minitest', '~> 5.0'

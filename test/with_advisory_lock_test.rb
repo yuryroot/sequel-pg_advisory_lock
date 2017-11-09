@@ -115,9 +115,9 @@ describe Sequel::Postgres::PgAdvisoryLock do
     end
 
     it 'requires transaction opened before using transaction level lock' do
-      %i[
-        pg_advisory_xact_lock
-        pg_try_advisory_xact_lock
+      [
+        :pg_advisory_xact_lock,
+        :pg_try_advisory_xact_lock
       ].each do |lock_function|
         subject.register_advisory_lock(lock_function, lock_function)
 

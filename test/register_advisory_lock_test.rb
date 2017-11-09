@@ -5,11 +5,11 @@ describe Sequel::Postgres::PgAdvisoryLock do
 
   describe '#register_advisory_lock' do
     let(:supported_lock_functions) do
-      %i[
-        pg_advisory_lock
-        pg_try_advisory_lock
-        pg_advisory_xact_lock
-        pg_try_advisory_xact_lock
+      [
+        :pg_advisory_lock,
+        :pg_try_advisory_lock,
+        :pg_advisory_xact_lock,
+        :pg_try_advisory_xact_lock
       ]
     end
 

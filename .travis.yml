@@ -21,14 +21,11 @@ matrix:
 before_install:
   - gem install bundler
 
-#script: bundle exec rake spec_travis
-#gemfile: .travis.gemfile
-
 before_script:
   - psql -c 'create database sequel_test;' -U postgres
 
 env:
-  - PG_TEST_DB=postgres://localhost/sequel_test?user=postgres
+  - TEST_DB_NAME=sequel_test
 
 addons:
   postgresql: "9.6"

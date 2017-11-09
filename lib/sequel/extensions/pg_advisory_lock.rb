@@ -5,14 +5,14 @@ module Sequel
   module Postgres
     module PgAdvisoryLock
 
-      SESSION_LEVEL_LOCKS = %i[
-        pg_advisory_lock
-        pg_try_advisory_lock
+      SESSION_LEVEL_LOCKS = [
+        :pg_advisory_lock,
+        :pg_try_advisory_lock
       ].freeze
 
-      TRANSACTION_LEVEL_LOCKS = %i[
-        pg_advisory_xact_lock
-        pg_try_advisory_xact_lock
+      TRANSACTION_LEVEL_LOCKS = [
+        :pg_advisory_xact_lock,
+        :pg_try_advisory_xact_lock
       ].freeze
 
       LOCK_FUNCTIONS = (SESSION_LEVEL_LOCKS + TRANSACTION_LEVEL_LOCKS).freeze

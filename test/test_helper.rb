@@ -5,5 +5,18 @@ require 'minitest/autorun'
 require 'yaml'
 require 'set'
 
-DB = Sequel.connect(ENV['PG_TEST_DB'] || 'postgres://localhost/postgres?user=postgres', pool_timeout: 10)
+database = ENV['TEST_DB_NAME'] || 'postgres'
+user     = ENV['TEST_DB_USER'] || 'postgres'
+
+connection_string_prefix =
+  if RUBY_PLATFORM =~ /java/
+    'jdbc:postgresql://'
+  else
+    'postgres://'
+  end
+
+connection_string = "#{connection_string_prefix}localhost/#{database}?user=#{user}"
+
+DB = Sequel.connect(connection_string, pool_timeout: 10)
+
 DB.extension(:pg_advisory_lock)
