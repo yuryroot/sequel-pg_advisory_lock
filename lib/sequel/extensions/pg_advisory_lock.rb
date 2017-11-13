@@ -38,7 +38,7 @@ module Sequel
           #       while opening database transaction.
           #       That's why this check must be smarter.
           unless in_transaction?
-            raise "Transaction must be manually opened before using transaction level lock '#{lock_function}'"
+            raise Error, "Transaction must be manually opened before using transaction level lock '#{lock_function}'"
           end
 
           if get(Sequel.function(lock_function, *function_params))

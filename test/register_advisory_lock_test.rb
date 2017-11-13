@@ -41,7 +41,7 @@ describe Sequel::Postgres::PgAdvisoryLock do
       lock_name = :not_supported_lock_function_test
       lock_function = :not_supported_lock_function
 
-      exception = assert_raises do
+      exception = assert_raises(Sequel::Error) do
         subject.register_advisory_lock(lock_name, lock_function)
       end
       assert_match /Invalid lock function/, exception.message
@@ -51,7 +51,7 @@ describe Sequel::Postgres::PgAdvisoryLock do
       lock_name = :multiple_locks_with_same_name_test
       subject.register_advisory_lock(lock_name, supported_lock_functions[0])
 
-      exception = assert_raises do
+      exception = assert_raises(Sequel::Error) do
         subject.register_advisory_lock(lock_name, supported_lock_functions[1])
       end
       assert_match /Lock with name .+ is already registered/, exception.message

@@ -121,7 +121,7 @@ describe Sequel::Postgres::PgAdvisoryLock do
       ].each do |lock_function|
         subject.register_advisory_lock(lock_function, lock_function)
 
-        exception = assert_raises do
+        exception = assert_raises(Sequel::Error) do
           subject.with_advisory_lock(lock_function) { }
         end
 
