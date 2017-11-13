@@ -18,6 +18,11 @@ matrix:
     - rvm: ruby-head
     - rvm: jruby-19mode
 
+gemfile:
+  - gemfiles/sequel-3.gemfile
+  - gemfiles/sequel-4.gemfile
+  - gemfiles/sequel-5.gemfile
+
 before_install:
   - gem install bundler
 
