@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Yury Shchyhlinski']
   spec.email         = ['Shchyhlinski.YL@gmail.com']
 
-  spec.summary       = "#{spec.name} is an extension for ruby Sequel library that helps using pg_advisory_lock functions of Postgres"
+  spec.summary       = "#{spec.name} is an extension for ruby Sequel library that helps using PostgreSQL advisory locks"
   spec.homepage      = "https://github.com/yuryroot/#{spec.name}"
   spec.license       = 'MIT'
 
