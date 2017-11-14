@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sequel'
 
   if RUBY_PLATFORM =~ /java/
-    spec.add_development_dependency 'jdbc-postgres'
+    spec.add_development_dependency 'jdbc-postgres', '9.4.1200'
   elsif RUBY_VERSION < '2.0.0'
     spec.add_development_dependency 'pg', '<0.19.0'
   else
