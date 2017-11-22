@@ -4,6 +4,8 @@ Gem `sequel-pg_advisory_lock` is an extension for ruby [Sequel](https://github.c
 that helps using [PostgreSQL advisory locks](https://www.postgresql.org/docs/9.6/static/explicit-locking.html#ADVISORY-LOCKS)
 in your application.
 
+You can use this extension like “application level mutex” to prevent concurrent execution of some code from any thread/process.
+
 ## Installation
 
 Add this line to your application's Gemfile:
