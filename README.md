@@ -49,7 +49,7 @@ It's also possible to specify different function in second parameter of `registe
 DB.register_advisory_lock(:my_lock, :pg_try_advisory_lock)
 ````
 
-All supported lock functions are described in [here](#available-types-of-locks). 
+All supported lock functions are described [here](#available-types-of-locks). 
 
 Finally, you can use registered lock:  
 
