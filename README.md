@@ -1,10 +1,8 @@
 # sequel-pg_advisory_lock [![Build Status](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock.svg?branch=master)](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock)
 
 Gem `sequel-pg_advisory_lock` is an extension for ruby [Sequel](https://github.com/jeremyevans/sequel) library 
-that helps using [PostgreSQL advisory locks](https://www.postgresql.org/docs/9.6/static/explicit-locking.html#ADVISORY-LOCKS)
-in your application.
-
-You can use this extension like “application level mutex” to prevent concurrent execution of some code from any thread/process.
+that allows using [PostgreSQL advisory locks](https://www.postgresql.org/docs/9.6/static/explicit-locking.html#ADVISORY-LOCKS)
+for application-level mutexes.
 
 ## Installation
 
@@ -55,7 +53,9 @@ Finally, you can use registered lock:
 
 ```ruby
 DB.with_advisory_lock(:my_lock) do
-  # do something 
+  # do something
+  # this block works like application-level mutex, 
+  # so code inside block is protected from concurrent execution 
 end
 
 ``` 
@@ -64,7 +64,9 @@ An optional *4-bytes integer* parameter can be passed to `with_advisory_lock` me
 
 ```ruby
 DB.with_advisory_lock(:my_lock, 1) do
-  # do something   
+  # do something
+  # this block works like application-level mutex, 
+  # so code inside block is protected from concurrent execution 
 end
 
 ```
