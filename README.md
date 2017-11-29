@@ -1,4 +1,7 @@
-# sequel-pg_advisory_lock [![Build Status](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock.svg?branch=master)](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock)
+# sequel-pg_advisory_lock 
+
+[![Build Status](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock.svg?branch=master)](https://travis-ci.org/yuryroot/sequel-pg_advisory_lock)
+[![Gem Version](https://badge.fury.io/rb/sequel-pg_advisory_lock.svg)](https://badge.fury.io/rb/sequel-pg_advisory_lock)
 
 Gem `sequel-pg_advisory_lock` is an extension for ruby [Sequel](https://github.com/jeremyevans/sequel) library 
 that allows using [PostgreSQL advisory locks](https://www.postgresql.org/docs/9.6/static/explicit-locking.html#ADVISORY-LOCKS)
