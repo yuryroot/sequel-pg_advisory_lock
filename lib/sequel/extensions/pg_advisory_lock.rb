@@ -7,18 +7,27 @@ module Sequel
 
       SESSION_LEVEL_LOCKS = [
         :pg_advisory_lock,
-        :pg_try_advisory_lock
+        :pg_try_advisory_lock,
+        :pg_advisory_lock_shared,
+        :pg_try_advisory_lock_shared
       ].freeze
 
       TRANSACTION_LEVEL_LOCKS = [
         :pg_advisory_xact_lock,
-        :pg_try_advisory_xact_lock
+        :pg_try_advisory_xact_lock,
+        :pg_advisory_xact_lock_shared,
+        :pg_try_advisory_xact_lock_shared
       ].freeze
 
       LOCK_FUNCTIONS = (SESSION_LEVEL_LOCKS + TRANSACTION_LEVEL_LOCKS).freeze
 
       DEFAULT_LOCK_FUNCTION = :pg_advisory_lock
-      UNLOCK_FUNCTION = :pg_advisory_unlock
+      UNLOCK_FUNCTIONS = {
+        pg_advisory_lock: :pg_advisory_unlock,
+        pg_try_advisory_lock: :pg_advisory_unlock,
+        pg_advisory_lock_shared: :pg_advisory_unlock_shared,
+        pg_try_advisory_lock_shared: :pg_advisory_unlock_shared
+      }.freeze
 
       def registered_advisory_locks
         @registered_advisory_locks ||= {}
@@ -50,7 +59,7 @@ module Sequel
               begin
                 result = yield
               ensure
-                get(Sequel.function(UNLOCK_FUNCTION, *function_params))
+                get(Sequel.function(UNLOCK_FUNCTIONS[lock_function], *function_params))
                 result
               end
             end
