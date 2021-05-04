@@ -8,8 +8,12 @@ describe Sequel::Postgres::PgAdvisoryLock do
       [
         :pg_advisory_lock,
         :pg_try_advisory_lock,
+        :pg_advisory_lock_shared,
+        :pg_try_advisory_lock_shared,
         :pg_advisory_xact_lock,
-        :pg_try_advisory_xact_lock
+        :pg_try_advisory_xact_lock,
+        :pg_advisory_xact_lock_shared,
+        :pg_try_advisory_xact_lock_shared
       ]
     end
 
